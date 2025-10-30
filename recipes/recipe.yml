@@ -25,7 +25,6 @@ modules:
     install:
       packages:
         - micro
-        - steam
         - nodejs
         - npm
         - vim
