@@ -7,7 +7,7 @@ description: Fedora Atomic Cosmic image customized to my personal needs
 
 # the base image to build on top of (FROM) and the version tag to use
 #base-image: ghcr.io/ublue-os/silverblue-main
-base-image: fedora/43/x86_64/cosmic-atomic
+base-image: quay.io/fedora-ostree-desktops/cosmic-atomic
 image-version: latest # latest is also supported if you want new updates ASAP
 
 # module configuration, executed in order
@@ -22,42 +22,46 @@ modules:
     repos:
       copr:
         - aquacash5/nerd-fonts
-        - atim/starship
+        - alciregi/distrobox
     install:
       packages:
         - micro
         - steam
         - nodejs
         - npm
-        - python3
         - vim
+        - tmux
         - oh-my-posh
         - hack-nerd-fonts
         - git
         - gcc
         - gcc-c++
+        - ranger
         - make
-        - podman-compose # Docker-compose compatibility
-        - libvirt # Virtualization API
-        - libvirt-daemon-config-network # Default network for libvirt
-        - libvirt-daemon-kvm # KVM hypervisor daemon
-        - qemu-kvm # QEMU virtualization
-        - virt-manager # GUI for managing VMs
-        - virt-install # Command line VM installation
-        - virt-viewer # VM display viewer
-        - kubernetes-client # kubectl command
+        - rust
+        - cargo
+        - podman-compose
+        - podman
+        - libvirt
+        - libvirt-daemon-config-network
+        - libvirt-daemon-kvm
+        - qemu-kvm
+        - virt-manager
+        - virt-install
+        - virt-viewer
+        - distrobox
+        - kubernetes-client
         - helm
-        - nmap # Network mapper
-        - nmap-ncat # nc (netcat) replacement
-        - wireshark # Network protocol analyzer
-        - btop # Modern resource monitor
-        - iotop # I/O monitor
-        - iftop # Network bandwidth monitor
-        - nethogs # Per-process network monitor
-        - sysstat # Performance monitoring (sar, iostat, mpstat)
-        - strace # System call tracer
+        - nmap
+        - nmap-ncat
+        - wireshark
+        - btop
+        - iotop
+        - iftop
+        - nethogs
+        - sysstat
+        - strace
         - hwinfo
-        #- starship
     remove:
       packages:
         # example: removing firefox (in favor of the flatpak)
