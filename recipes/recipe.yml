@@ -22,7 +22,6 @@ modules:
     repos:
       copr:
         - aquacash5/nerd-fonts
-        - alciregi/distrobox
     install:
       packages:
         - micro
@@ -49,7 +48,6 @@ modules:
         - virt-manager
         - virt-install
         - virt-viewer
-        - distrobox
         - kubernetes-client
         - helm
         - nmap
