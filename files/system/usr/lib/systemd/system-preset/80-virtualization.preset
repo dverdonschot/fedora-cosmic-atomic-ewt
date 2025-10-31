@@ -1,0 +1,7 @@
+# Enable libvirt services for virt-manager support
+enable libvirtd.socket
+enable virtnetworkd.socket
+enable virtqemud.socket
+
+# Enable podman socket for Docker-compatible API access
+enable podman.socket

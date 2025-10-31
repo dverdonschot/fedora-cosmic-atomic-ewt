@@ -34,6 +34,19 @@ The `latest` tag will automatically point to the latest build. That build will s
 
 If build on Fedora Atomic, you can generate an offline ISO with the instructions available [here](https://blue-build.org/learn/universal-blue/#fresh-install-from-an-iso). These ISOs cannot unfortunately be distributed on GitHub for free due to large sizes, so for public projects something else has to be used for hosting.
 
+## Post-Installation Configuration
+
+### Optional: Disable CPU C-State 6 (AMD CPUs)
+
+If you experience issues with deep CPU sleep states, you can disable C-State 6:
+
+```bash
+rpm-ostree kargs --append=processor.max_cstate=5
+systemctl reboot
+```
+
+This setting persists across updates and only needs to be applied once.
+
 ## Verification
 
 These images are signed with [Sigstore](https://www.sigstore.dev/)'s [cosign](https://github.com/sigstore/cosign). You can verify the signature by downloading the `cosign.pub` file from this repo and running the following command:

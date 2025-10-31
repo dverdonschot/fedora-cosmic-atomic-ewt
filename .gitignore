@@ -1,3 +1,7 @@
 cosign.key
 cosign.private
 /Containerfile
+
+# Claude Code
+CLAUDE.md
+.claude/
