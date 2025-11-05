@@ -36,14 +36,25 @@ If build on Fedora Atomic, you can generate an offline ISO with the instructions
 
 ## Post-Installation Configuration
 
-### Optional: Disable CPU C-State 6 (AMD CPUs)
+### AMD GPU Stability (Built-in)
 
-If you experience issues with deep CPU sleep states, you can disable C-State 6:
+This image includes AMD GPU stability fixes for systems with AMD Radeon integrated graphics (tested on Radeon 780M). The following kernel parameters are automatically applied:
+
+- `amdgpu.gpu_recovery=1` - Enables GPU recovery mechanisms
+- `amdgpu.ppfeaturemask=0xffffffff` - Enables all power play features
+
+These fixes address spontaneous reboot issues related to GPU power state restoration failures. No manual configuration is needed.
+
+### Optional: CPU C-State Configuration (AMD CPUs)
+
+If you still experience issues with deep CPU sleep states after the GPU fixes above, you can limit CPU C-states:
 
 ```bash
-rpm-ostree kargs --append=processor.max_cstate=5
+rpm-ostree kargs --append=processor.max_cstate=3
 systemctl reboot
 ```
+
+**Note:** The incorrect Intel-specific parameter `intel_idle.max_cstate=5` should NOT be used on AMD systems. Use `processor.max_cstate` instead, which works on both Intel and AMD CPUs.
 
 This setting persists across updates and only needs to be applied once.
 
