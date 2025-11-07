@@ -1,8 +1,24 @@
 # fedora-cosmic-atomic-ewt &nbsp; [![bluebuild build badge](https://github.com/dverdonschot/fedora-cosmic-atomic-ewt/actions/workflows/build.yml/badge.svg)](https://github.com/dverdonschot/fedora-cosmic-atomic-ewt/actions/workflows/build.yml)
 
-See the [BlueBuild docs](https://blue-build.org/how-to/setup/) for quick setup instructions for setting up your own repository based on this template.
+A custom Fedora Atomic image built on COSMIC desktop environment, featuring personal customizations and development tools.
 
-After setup, it is recommended you update this README to describe your custom image.
+## Features
+
+- **COSMIC Desktop Environment:** Modern, Rust-based desktop from System76
+- **Development Tools:** Pre-configured with Rust, Node.js, Python, and more
+- **Virtualization Ready:** libvirt, QEMU, virt-manager included
+- **AMD GPU Stability Fixes:** Automatic kernel parameters for Radeon graphics
+- **COSMIC Vimified:** Keyboard-driven hint navigation (in development)
+
+## Projects in this Repository
+
+### COSMIC Vimified
+
+A keyboard-driven hint navigation system for COSMIC desktop, inspired by the Vimium browser extension. This allows mouseless interaction with GUI elements across your entire desktop.
+
+**Status:** Planning & Specification Phase
+
+See [cosmic-vimified/README.md](cosmic-vimified/README.md) for details.
 
 ## Installation
 

@@ -1,0 +1,104 @@
+// COSMIC Vimified Configuration Example
+// Copy this file to: ~/.config/cosmic-vimified/config.ron
+
+(
+    // Keyboard bindings configuration
+    keybindings: (
+        activate: "f",              // Main activation key (or "Super+f")
+        cancel: "Escape",           // Cancel/hide hints
+        scroll_left: "h",           // Vim-style scroll left
+        scroll_down: "j",           // Vim-style scroll down
+        scroll_up: "k",             // Vim-style scroll up
+        scroll_right: "l",          // Vim-style scroll right
+        modifier_right_click: "Shift",  // Hold Shift while typing hint for right-click
+    ),
+
+    // Visual appearance of hints
+    appearance: (
+        hint_bg_color: "#3daee9",       // Background color (light blue)
+        hint_text_color: "#ffffff",     // Text color (white)
+        hint_border_color: "#1d99f3",   // Border color (darker blue)
+        hint_border_width: 2,           // Border width in pixels
+        hint_font_family: "Hack Nerd Font",  // Font family
+        hint_font_size: 16,             // Font size in points
+        hint_padding: 4,                // Padding in pixels
+        hint_border_radius: 4,          // Border radius in pixels
+        hint_opacity: 0.95,             // Opacity (0.0 to 1.0)
+    ),
+
+    // Keyboard layout mode
+    keyboard_layout: (
+        mode: Standard,     // Standard | LeftHanded | RightHanded | Custom
+        // custom_keys: "asdfjkl;",  // Uncomment for Custom mode
+    ),
+
+    // Element detection settings
+    detection: (
+        enabled_element_types: [
+            "Button",
+            "Link",
+            "MenuItem",
+            "Icon",
+            "Input",
+            "Tab",
+            "ListItem",
+            "WindowControl",
+        ],
+        include_disabled_elements: false,
+        detection_refresh_rate: 100,    // Milliseconds between refreshes
+    ),
+
+    // Application filtering
+    application_control: (
+        mode: All,  // All | AllowList | DenyList
+
+        // Uncomment for AllowList mode:
+        // allowed_apps: [
+        //     "org.cosmic.Files",
+        //     "org.cosmic.Terminal",
+        //     "firefox",
+        // ],
+
+        // Uncomment for DenyList mode:
+        // denied_apps: [
+        //     "org.keepassxc.KeePassXC",  // Password manager
+        //     "banking-app",               // Sensitive apps
+        // ],
+    ),
+
+    // Per-application custom settings (optional)
+    per_app_config: {
+        // Example: Firefox with different hint color
+        "firefox": (
+            appearance: (
+                hint_bg_color: "#ff9500",  // Orange hints for Firefox
+            ),
+            // Only show hints for Firefox UI, not webpage content
+            detection: (
+                enabled_element_types: ["MenuItem", "Button"],
+            ),
+        ),
+
+        // Example: Terminal with different activation key
+        "org.cosmic.Terminal": (
+            keybindings: (
+                activate: "Super+f",  // Avoid conflict with 'f' in terminal
+            ),
+        ),
+    },
+
+    // Accessibility settings
+    accessibility: (
+        announce_activation: true,      // Announce "Hints active" to screen readers
+        announce_count: false,          // Announce number of hints available
+        high_contrast_mode: false,      // Use high contrast colors (auto-detect from system)
+        minimum_hint_size: 14,          // Minimum font size (accessibility)
+    ),
+
+    // Performance settings
+    performance: (
+        element_cache_duration: 100,    // Cache element positions (ms)
+        max_hints_displayed: 500,       // Maximum number of hints to show
+        multi_monitor_support: true,    // Enable multi-monitor support
+    ),
+)

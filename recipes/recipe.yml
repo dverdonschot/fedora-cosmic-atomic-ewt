@@ -22,11 +22,14 @@ modules:
     repos:
       copr:
         - aquacash5/nerd-fonts
+        - robot/rust-analyzer
     install:
       packages:
         - micro
         - nodejs
         - npm
+        - python3
+        - python3-pip
         - vim
         - tmux
         - oh-my-posh
@@ -38,6 +41,8 @@ modules:
         - make
         - rust
         - cargo
+        - rust
+        - rust-analyzer
         - podman-compose
         - podman
         - libvirt
@@ -88,12 +93,13 @@ modules:
   # Fix 1: AMD GPU power state restoration failures
   # Fix 2: S0ix Modern Standby crashes during idle (ACPI power state transitions)
   - type: kernel-args
-    defaults:
+    args:
       # AMD GPU recovery
-      - amdgpu.gpu_recovery=1        # Enable GPU recovery mechanisms
-      - amdgpu.ppfeaturemask=0xffffffff  # Enable all power play features
+      - amdgpu.gpu_recovery=1 # Enable GPU recovery mechanisms
+      - amdgpu.ppfeaturemask=0xffffffff # Enable all power play features
       # S0ix sleep/idle stability
-      - mem_sleep_default=deep       # Use traditional deep sleep instead of Modern Standby
-      - processor.max_cstate=2       # Prevent problematic C3 deep idle state
+      - mem_sleep_default=deep # Use traditional deep sleep instead of Modern Standby
+      - processor.max_cstate=1 # Prevent problematic C-states
+      - intel_idle.max_cstate=0 # Prevent problematic C-states
 
   - type: signing # this sets up the proper policy & signing files for signed images to work fully
