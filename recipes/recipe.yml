@@ -100,6 +100,5 @@ modules:
       # S0ix sleep/idle stability
       - mem_sleep_default=deep # Use traditional deep sleep instead of Modern Standby
       - processor.max_cstate=1 # Prevent problematic C-states
-      - intel_idle.max_cstate=0 # Prevent problematic C-states
 
   - type: signing # this sets up the proper policy & signing files for signed images to work fully
