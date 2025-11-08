@@ -8,9 +8,10 @@ license = "GPL-3.0-or-later"
 repository = "https://github.com/dverdonschot/fedora-cosmic-atomic-ewt"
 
 [dependencies]
-# libcosmic - COSMIC desktop framework
-libcosmic = { git = "https://github.com/pop-os/libcosmic.git", features = ["winit"] }
-cosmic-config = { git = "https://github.com/pop-os/libcosmic.git" }
+# iced_layershell - Wayland layer shell for iced
+iced = { version = "0.13", features = ["tokio", "advanced"] }
+iced_runtime = "0.13"
+iced_layershell = { version = "0.13" }
 
 # AT-SPI for accessibility tree querying
 atspi = { version = "0.29", default-features = false, features = ["zbus", "tokio", "connection", "proxies"] }
@@ -22,6 +23,11 @@ uinput = "0.1"
 
 # Async runtime
 tokio = { version = "1.35", features = ["full"] }
+
+# CLI and D-Bus
+clap = { version = "4.5", features = ["derive"] }
+zbus = "5.2"
+once_cell = "1.20"
 
 # Error handling
 anyhow = "1.0"

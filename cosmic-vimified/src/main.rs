@@ -2,12 +2,13 @@
 // Copyright (C) 2025 COSMIC Vimified Contributors
 // Licensed under GPL-3.0-or-later
 
-mod app;
+mod layershell_app;
 mod detection;
 mod overlay;
+mod commands;
+mod daemon;
+mod cli;
 
-use cosmic::app::Settings;
-use cosmic::iced::Size;
 use tracing_subscriber::EnvFilter;
 
 fn main() -> Result<(), Box<dyn std::error::Error>> {
@@ -18,12 +19,62 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
     tracing::info!("COSMIC Vimified starting...");
     tracing::info!("Version: {}", env!("CARGO_PKG_VERSION"));
 
-    let settings = Settings::default()
-        .size(Size::new(1920.0, 1080.0))
-        .transparent(true)
-        .exit_on_close(true);
+    // Parse CLI arguments
+    use clap::Parser;
+    let cli = cli::Cli::parse();
 
-    cosmic::app::run::<app::App>(settings, ())?;
+    // Create tokio runtime for async operations
+    let rt = tokio::runtime::Runtime::new()?;
 
+    rt.block_on(async {
+        match cli.command {
+            Some(cli::Commands::Daemon) | None => {
+                // Check if already running
+                if daemon::is_already_running().await {
+                    tracing::error!("Daemon is already running");
+                    return Err("Daemon is already running".into());
+                }
+
+                // Start daemon mode - just listen for D-Bus commands
+                tracing::info!("Starting in daemon mode (overlay will start on first Show command)");
+
+                // Start D-Bus service and wait for commands
+                daemon::run_daemon().await?;
+
+                Ok(())
+            }
+            Some(cli::Commands::Show) => {
+                tracing::info!("Sending show command to daemon");
+                daemon::send_show_command().await?;
+                Ok(())
+            }
+            Some(cli::Commands::Hide) => {
+                tracing::info!("Sending hide command to daemon");
+                send_daemon_command("Hide").await?;
+                Ok(())
+            }
+            Some(cli::Commands::Toggle) => {
+                tracing::info!("Sending toggle command to daemon");
+                send_daemon_command("Toggle").await?;
+                Ok(())
+            }
+        }
+    })
+}
+
+async fn send_daemon_command(command: &str) -> Result<(), Box<dyn std::error::Error>> {
+    use zbus::Connection;
+
+    let connection = Connection::session().await?;
+
+    connection.call_method(
+        Some("com.cosmic.Vimified"),
+        "/com/cosmic/Vimified",
+        Some("com.cosmic.Vimified1"),
+        command,
+        &(),
+    ).await?;
+
+    tracing::info!("Sent {} command to running instance", command);
     Ok(())
 }

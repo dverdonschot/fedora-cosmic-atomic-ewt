@@ -22,7 +22,6 @@ modules:
     repos:
       copr:
         - aquacash5/nerd-fonts
-        - robot/rust-analyzer
     install:
       packages:
         - micro
@@ -42,7 +41,6 @@ modules:
         - rust
         - cargo
         - rust
-        - rust-analyzer
         - podman-compose
         - podman
         - libvirt
