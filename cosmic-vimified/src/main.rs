@@ -27,7 +27,7 @@ fn main() -> Result<()> {
     println!("See docs/SPEC.md for the full specification.\n");
     println!("Planned features:");
     println!("  • Keyboard hint navigation (like Vimium for desktop)");
-    println!("  • Single-key activation (f or Super+f)");
+    println!("  • Super+G activation (avoids Super+F file explorer conflict)");
     println!("  • Home-row optimized hints (asdfjkl;)");
     println!("  • Click and right-click actions");
     println!("  • Vim-style scrolling (hjkl)");

@@ -11,8 +11,8 @@ COSMIC Vimified is a keyboard-driven hint navigation system for the COSMIC deskt
 ## 1. Activation & Trigger Mechanism
 
 ### Primary Activation
-- **Preferred shortcut:** Single key `f` (if technically feasible)
-- **Fallback shortcut:** `Super+f`
+- **Shortcut:** `Super+G`
+- **Rationale:** `Super+F` conflicts with COSMIC's default file explorer shortcut
 - **Behavior:** Toggle mode
   - First press: Show hints overlay
   - Second press (or ESC): Hide hints overlay
@@ -190,7 +190,7 @@ Configuration options in `~/.config/cosmic-vimified/config.ron`:
 ```ron
 (
     keybindings: (
-        activate: "f",           // or "Super+f"
+        activate: "Super+g",     // Main activation shortcut
         cancel: "Escape",
         scroll_left: "h",
         scroll_down: "j",
@@ -258,7 +258,7 @@ Configuration options in `~/.config/cosmic-vimified/config.ron`:
         ),
         "org.cosmic.Terminal": (
             keybindings: (
-                activate: "Super+f",  // Avoid conflict with 'f' key in terminal
+                activate: "Super+g",  // Consistent across all apps
             ),
         ),
     },
@@ -429,7 +429,7 @@ sudo install -Dm755 target/debug/cosmic-vimified /usr/local/bin/cosmic-vimified
 echo "Restarting service..."
 systemctl --user restart cosmic-vimified
 
-echo "Done! Press f (or Super+f) to test."
+echo "Done! Press Super+G to test."
 ```
 
 #### Watch Mode for Auto-rebuild

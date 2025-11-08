@@ -13,7 +13,7 @@ COSMIC Vimified enables you to interact with GUI elements using your keyboard, j
 
 ### Features (Planned)
 
-- Single-key activation (f or Super+f)
+- Super+G activation (avoids conflict with COSMIC's Super+F file explorer)
 - Vimium-style hint labels (home row optimized: asdfjkl;)
 - Click and right-click actions
 - Vim-style scrolling (hjkl)
@@ -67,7 +67,7 @@ Example configuration:
 ```ron
 (
     keybindings: (
-        activate: "f",
+        activate: "Super+g",
     ),
     appearance: (
         hint_bg_color: "#3daee9",

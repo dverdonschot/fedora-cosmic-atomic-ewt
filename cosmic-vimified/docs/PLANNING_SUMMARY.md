@@ -13,7 +13,7 @@
 
 ### 2. Specification Document ✓
 Created comprehensive specification covering:
-- Activation mechanism (f or Super+f, toggle mode)
+- Activation mechanism (Super+G, toggle mode)
 - Feature scope (click, right-click, vim scrolling)
 - Hint label generation (Vimium-style, home-row optimized)
 - Element detection strategy (AT-SPI based)
@@ -106,10 +106,10 @@ Designed multi-phase build integration:
 
 These need research during architecture phase:
 
-1. **Global Keyboard Shortcuts**
-   - How to register in cosmic-comp?
-   - Can we use single key (f) without conflicts?
-   - API/protocol to use?
+1. **Global Keyboard Shortcuts** ✅ RESOLVED
+   - Register via cosmic-comp config (RON format)
+   - Single-key shortcuts won't work for letters (breaks typing)
+   - Using Super+G (avoids Super+F file explorer conflict)
 
 2. **Layer Shell Overlays**
    - Which layer-shell protocol (wlr vs cosmic-specific)?

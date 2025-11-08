@@ -4,7 +4,7 @@
 (
     // Keyboard bindings configuration
     keybindings: (
-        activate: "f",              // Main activation key (or "Super+f")
+        activate: "Super+g",        // Main activation key (avoids Super+F file explorer)
         cancel: "Escape",           // Cancel/hide hints
         scroll_left: "h",           // Vim-style scroll left
         scroll_down: "j",           // Vim-style scroll down
@@ -79,10 +79,10 @@
             ),
         ),
 
-        // Example: Terminal with different activation key
+        // Example: Terminal uses same activation key
         "org.cosmic.Terminal": (
             keybindings: (
-                activate: "Super+f",  // Avoid conflict with 'f' in terminal
+                activate: "Super+g",  // Consistent across all apps
             ),
         ),
     },
