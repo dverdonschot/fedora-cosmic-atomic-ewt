@@ -1,0 +1,12 @@
+# udev rules for COSMIC Vimified
+# Allows non-root access to /dev/uinput for input event synthesis
+#
+# Installation:
+#   sudo cp 99-cosmic-vimified.rules /etc/udev/rules.d/
+#   sudo udevadm control --reload-rules
+#   sudo udevadm trigger
+#   # Add user to input group:
+#   sudo usermod -aG input $USER
+#   # Log out and back in for group changes to take effect
+
+KERNEL=="uinput", GROUP="input", MODE="0660", TAG+="uaccess"

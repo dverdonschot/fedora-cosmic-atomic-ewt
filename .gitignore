@@ -5,3 +5,6 @@ cosign.private
 # Claude Code
 CLAUDE.md
 .claude/
+
+cosmic-vimified/target/*
+.serena/*

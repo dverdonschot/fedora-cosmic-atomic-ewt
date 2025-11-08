@@ -89,15 +89,4 @@ modules:
     scripts:
       - setup-libvirt.sh
 
-  # Stability fixes for Minisforum UM790 (AMD Ryzen 9 7940HS + Radeon 780M)
-  # Fix 1: AMD GPU power state restoration failures
-  # Fix 2: S0ix Modern Standby crashes during idle (ACPI power state transitions)
-  - type: kernel-args
-    args:
-      # AMD GPU recovery
-      - amdgpu.gpu_recovery=1 # Enable GPU recovery mechanisms
-      - amdgpu.ppfeaturemask=0xffffffff # Enable all power play features
-      # S0ix sleep/idle stability
-      - mem_sleep_default=deep # Use traditional deep sleep instead of Modern Standby
-
   - type: signing # this sets up the proper policy & signing files for signed images to work fully
