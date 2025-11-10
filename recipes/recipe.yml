@@ -40,7 +40,7 @@ modules:
         - clang
         - llvm
         - llvm-devel
-        - libOpenCL-dev
+        - mesa-libOpenCL-devel
         - ranger
         - make
         - rust
