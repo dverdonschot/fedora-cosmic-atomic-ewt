@@ -4,6 +4,7 @@
 
 mod layershell_app;
 mod detection;
+mod hints;
 mod overlay;
 mod commands;
 mod daemon;
@@ -62,6 +63,15 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
     })
 }
 
+/// Sends a command to the running COSMIC Vimified daemon via D-Bus.
+///
+/// # Arguments
+///
+/// * `command` - The D-Bus method name to invoke (e.g., "Hide", "Toggle")
+///
+/// # Errors
+///
+/// Returns an error if the D-Bus connection fails or the daemon is not running.
 async fn send_daemon_command(command: &str) -> Result<(), Box<dyn std::error::Error>> {
     use zbus::Connection;
 

@@ -8,11 +8,23 @@ use atspi_proxies::component::ComponentProxy;
 use std::pin::Pin;
 use std::future::Future;
 
+/// AT-SPI detector for finding clickable UI elements across all applications.
+///
+/// This detector connects to the accessibility bus and traverses the AT-SPI tree
+/// to find all clickable elements (buttons, links, etc.) on the screen.
 pub struct AtSpiDetector {
+    /// Connection to the AT-SPI accessibility bus
     connection: AccessibilityConnection,
 }
 
 impl AtSpiDetector {
+    /// Creates a new AT-SPI detector and establishes connection to the accessibility bus.
+    ///
+    /// # Errors
+    ///
+    /// Returns an error if:
+    /// - Session accessibility cannot be enabled
+    /// - Connection to the AT-SPI bus fails
     pub async fn new() -> Result<Self> {
         atspi::connection::set_session_accessibility(true)
             .await
@@ -26,6 +38,18 @@ impl AtSpiDetector {
         Ok(Self { connection })
     }
 
+    /// Detects all clickable elements across all accessible applications.
+    ///
+    /// Traverses the entire AT-SPI accessibility tree, identifying and filtering
+    /// clickable elements based on their role, state, and size.
+    ///
+    /// # Returns
+    ///
+    /// A vector of detected elements with their screen positions and metadata.
+    ///
+    /// # Errors
+    ///
+    /// Returns an error if the AT-SPI registry or child applications cannot be accessed.
     pub async fn detect_all_elements(&self) -> Result<Vec<DetectedElement>> {
         let mut elements = Vec::new();
 
@@ -116,10 +140,7 @@ impl AtSpiDetector {
         let role = accessible.get_role().await?;
         let states = accessible.get_state().await?;
 
-        if !filters::should_process_element(role, &states) {
-            return Ok(());
-        }
-
+        // Get bounds first to check size before creating expensive proxies
         let component = ComponentProxy::builder(accessible.inner().connection())
             .destination(accessible.inner().destination())?
             .path(accessible.inner().path())?
@@ -135,7 +156,13 @@ impl AtSpiDetector {
             height: extents.3,
         };
 
+        // Basic bounds validity check
         if !bounds.is_valid() {
+            return Ok(());
+        }
+
+        // Apply comprehensive filtering with role, states, and bounds
+        if !filters::should_process_element(role, &states, &bounds) {
             return Ok(());
         }
 
@@ -146,7 +173,7 @@ impl AtSpiDetector {
 
         let element = DetectedElement::new(bounds, role, name, app_name, description);
 
-        tracing::trace!("Found element: {}", element);
+        tracing::debug!("Found clickable element: {} [{}]", element.name, element.role);
         elements.push(element);
 
         Ok(())

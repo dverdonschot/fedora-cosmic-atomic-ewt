@@ -36,9 +36,15 @@ modules:
         - git
         - gcc
         - gcc-c++
+        - ollama
+        - clang
+        - llvm
+        - llvm-devel
+        - libOpenCL-dev
         - ranger
         - make
         - rust
+        - rustup
         - cargo
         - rust
         - podman-compose

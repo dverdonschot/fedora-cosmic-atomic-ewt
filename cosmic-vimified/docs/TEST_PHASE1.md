@@ -1,10 +1,57 @@
-  cargo fmt --check                                                                                                                                                                                [0/111]
+  1. Build the Project
 
-  # Run clippy for warnings
-  cargo clippy -- -D warnings
+    First, ensure the project compiles without errors:
 
-  # Run any existing tests
-  cargo test
+    cd cosmic-vimified
+    cargo build
+
+    Expected: Clean build with no errors.
+
+    2. Run the Application
+
+    Launch the application with debug logging enabled:
+
+    RUST_LOG=debug cargo run
+
+    What to verify:
+    - ✅ Application launches without panicking
+    - ✅ You see log output: "COSMIC Vimified starting..." and version info
+    - ✅ A window or overlay appears on your screen
+    - ✅ The overlay is transparent (you can see through it)
+    - ✅ The overlay covers the full screen
+
+    3. Test ESC Key Handling
+
+    With the application running:
+
+    1. Press the ESC key
+    2. The application should close cleanly
+
+    What to verify:
+    - ✅ ESC key closes the application
+    - ✅ Clean shutdown with no error messages
+    - ✅ No zombie processes left behind
+
+    4. Check for Errors
+
+    Review the terminal output for:
+    - ✅ No panic messages
+    - ✅ No critical errors
+    - ✅ Proper initialization logs
+    - ✅ Clean shutdown logs
+
+    5. Additional Verification Tests
+
+    Run these commands to ensure code quality:
+
+    # Check code formatting
+    cargo fmt --check
+
+    # Run clippy for warnings
+    cargo clippy -- -D warnings
+
+    # Run any existing tests
+    cargo test
 
   6. Manual Interaction Tests
 
