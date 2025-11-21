@@ -36,6 +36,9 @@ modules:
         - git
         - gcc
         - gcc-c++
+        - pkgconf
+        - python3-devel
+        - dbus-devel
         - ollama
         - clang
         - llvm
