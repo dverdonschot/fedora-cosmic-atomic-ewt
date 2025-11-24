@@ -72,6 +72,8 @@ modules:
         - sysstat
         - strace
         - hwinfo
+        - tlp
+        - tlp-rdw
     remove:
       packages:
         # example: removing firefox (in favor of the flatpak)
