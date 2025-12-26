@@ -75,6 +75,7 @@ modules:
         - hwinfo
         - tlp
         - tlp-rdw
+        - linuxconsoletools
     remove:
       packages:
         # example: removing firefox (in favor of the flatpak)
