@@ -22,8 +22,6 @@ modules:
    repos:
      copr:
      - aquacash5/nerd-fonts
-     # Docker CE repository for Fedora
-     - url: https://download.docker.com/linux/fedora/docker-ce.repo
    install:
      packages:
      - micro
