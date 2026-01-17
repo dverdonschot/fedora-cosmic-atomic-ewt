@@ -4,4 +4,4 @@ enable virtnetworkd.socket
 enable virtqemud.socket
 
 # Enable podman socket for Docker-compatible API access
-enable podman.socket
+# enable podman.socket
