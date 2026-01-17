@@ -79,6 +79,9 @@ modules:
      - tlp
      - tlp-rdw
      - linuxconsoletools
+     # OCR
+     - tesseract
+     - tesseract-langpack-nld
    remove:
      packages:
      - firefox
