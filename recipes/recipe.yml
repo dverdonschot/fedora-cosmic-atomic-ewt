@@ -79,6 +79,8 @@ modules:
      - tlp
      - tlp-rdw
      - linuxconsoletools
+     # android
+     - waydroid
      # OCR
      - tesseract
      - tesseract-langpack-nld
