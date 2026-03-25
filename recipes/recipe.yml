@@ -81,6 +81,7 @@ modules:
      - linuxconsoletools
      # android
      - waydroid
+     - dkms
      # OCR
      - tesseract
      - tesseract-langpack-nld
