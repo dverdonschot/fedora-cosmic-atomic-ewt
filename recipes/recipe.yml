@@ -13,108 +13,108 @@ image-version: 43 # latest is also supported if you want new updates ASAP
 # module configuration, executed in order
 # you can include multiple instances of the same module
 modules:
- - type: files
-   files:
-   - source: system
-     destination: / # copies files/system/* into your image's root folder /
+  - type: files
+    files:
+      - source: system
+        destination: / # copies files/system/* into your image's root folder /
 
- - type: dnf
-   repos:
-     copr:
-     - aquacash5/nerd-fonts
-   install:
-     packages:
-     - micro
-     - nodejs
-     - npm
-     - python3
-     - python3-pip
-     - uv
-     - vim
-     - tmux
-     - oh-my-posh
-     - hack-nerd-fonts
-     - git
-     - gcc
-     - gcc-c++
-     - pkgconf
-     - python3-devel
-     - dbus-devel
-     - ollama
-     - clang
-     - llvm
-     - llvm-devel
-     - mesa-libOpenCL-devel
-     - ranger
-     - make
-     - rust
-     - rustup
-     - cargo
-     # Docker packages (replacing podman)
-     - docker-ce
-     - docker-ce-cli
-     - containerd.io
-     - docker-buildx-plugin
-     - docker-compose-plugin
-     - libvirt
-     - libvirt-daemon-config-network
-     - libvirt-daemon-kvm
-     - qemu-kvm
-     - qemu
-     - virt-manager
-     - virt-install
-     - virt-viewer
-     - kubernetes-client
-     - helm
-     - nmap
-     - nmap-ncat
-     - wireshark
-     - btop
-     - iotop
-     - iftop
-     - nethogs
-     - sysstat
-     - strace
-     - hwinfo
-     - tlp
-     - tlp-rdw
-     - linuxconsoletools
-     # android
-     - waydroid
-     - dkms
-     # OCR
-     - tesseract
-     - tesseract-langpack-nld
-   remove:
-     packages:
-     - firefox
-     - firefox-langpacks
+  - type: dnf
+    repos:
+      copr:
+        - aquacash5/nerd-fonts
+    install:
+      packages:
+        - micro
+        - nodejs
+        - npm
+        - python3
+        - python3-pip
+        - uv
+        - vim
+        - tmux
+        - oh-my-posh
+        - hack-nerd-fonts
+        - git
+        - gcc
+        - gcc-c++
+        - pkgconf
+        - python3-devel
+        - dbus-devel
+        - ollama
+        - clang
+        - llvm
+        - llvm-devel
+        - mesa-libOpenCL-devel
+        - ranger
+        - make
+        - rust
+        - rustup
+        - cargo
+        # Docker packages (replacing podman)
+        - docker-ce
+        - docker-ce-cli
+        - containerd.io
+        - docker-buildx-plugin
+        - docker-compose-plugin
+        - libvirt
+        - libvirt-daemon-config-network
+        - libvirt-daemon-kvm
+        - qemu-kvm
+        - qemu
+        - virt-manager
+        - virt-install
+        - virt-viewer
+        - kubernetes-client
+        - helm
+        - nmap
+        - nmap-ncat
+        - wireshark
+        - btop
+        - iotop
+        - iftop
+        - nethogs
+        - sysstat
+        - strace
+        - hwinfo
+        - tlp
+        - tlp-rdw
+        - linuxconsoletools
+        # android
+        - waydroid
+        - dkms
+        # OCR
+        - tesseract
+        - tesseract-langpack-nld
+    remove:
+      packages:
+        - firefox
+        - firefox-langpacks
 
- # Install Docker Desktop from RPM
- - type: rpm-ostree
-   install:
-     - https://desktop.docker.com/linux/main/amd64/docker-desktop-x86_64.rpm
+  # Install Docker Desktop from RPM
+  - type: rpm-ostree
+    install:
+      - https://desktop.docker.com/linux/main/amd64/docker-desktop-x86_64.rpm
 
- # Enable Docker service
- - type: systemd
-   system:
-     enabled:
-       - docker.service
+  # Enable Docker service
+  - type: systemd
+    system:
+      enabled:
+        - docker.service
 
- - type: default-flatpaks
-   configurations:
-   - notify: true
-     scope: system
-     install:
-     - org.mozilla.firefox
-     - com.github.tchx84.Flatseal
-     - io.freetubeapp.FreeTube
-     - dev.zed.Zed
-     - io.github.zen_browser.zen
-   - scope: user
+  - type: default-flatpaks
+    configurations:
+      - notify: true
+        scope: system
+        install:
+          - org.mozilla.firefox
+          - com.github.tchx84.Flatseal
+          - io.freetubeapp.FreeTube
+          - dev.zed.Zed
+          - io.github.zen_browser.zen
+      - scope: user
 
- - type: script
-   scripts:
-   - setup-libvirt.sh
+  - type: script
+    scripts:
+      - setup-libvirt.sh
 
- - type: signing
+  - type: signing
