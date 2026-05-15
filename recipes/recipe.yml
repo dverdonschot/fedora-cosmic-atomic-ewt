@@ -85,6 +85,7 @@ modules:
         # OCR
         - tesseract
         - tesseract-langpack-nld
+        - net-tools
     remove:
       packages:
         - firefox
