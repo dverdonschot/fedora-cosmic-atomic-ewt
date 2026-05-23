@@ -86,6 +86,7 @@ modules:
         - tesseract
         - tesseract-langpack-nld
         - net-tools
+        - traceroute
     remove:
       packages:
         - firefox
