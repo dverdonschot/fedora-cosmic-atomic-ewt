@@ -87,6 +87,8 @@ modules:
         - tesseract-langpack-nld
         - net-tools
         - traceroute
+        # monitoring
+        - golang-github-prometheus-node-exporter
     remove:
       packages:
         - firefox
@@ -102,6 +104,7 @@ modules:
     system:
       enabled:
         - docker.service
+        - node_exporter.service
 
   - type: default-flatpaks
     configurations:
