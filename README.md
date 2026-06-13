@@ -55,18 +55,24 @@ If build on Fedora Atomic, you can generate an offline ISO with the instructions
 ### Rootless Docker (one-time, after rebase)
 
 The image ships with **rootless Docker pre-configured**: `docker-ce-rootless-extras`
-is layered on (which provides the per-user systemd unit, the rootlesskit binaries,
-and the `dockerd-rootless-setuptool.sh` helper), `shadow-utils` (for
-`newuidmap`/`newgidmap`) and `fuse-overlayfs` are already in the base image, the
-system `docker.service` is masked, and the per-user `docker.service` is enabled.
-Two things to do once, after a fresh rebase:
+is layered on (which provides the per-user binaries, the rootlesskit helpers, and
+`dockerd-rootless-setuptool.sh`), `shadow-utils` (for `newuidmap`/`newgidmap`) and
+`fuse-overlayfs` are already in the base image, the system `docker.service` is masked.
+Three things to do once, after a fresh rebase, as your normal user (not root):
 
 ```bash
 # 1. Allow the per-user rootless dockerd to run at boot, before any login.
 #    Without this, it only starts when you're logged in via the desktop.
 sudo loginctl enable-linger $USER
 
-# 2. Verify rootless is actually the active daemon.
+# 2. Generate the per-user docker.service unit. This creates
+#    ~/.config/systemd/user/docker.service with the right paths for
+#    your user, and enables it. The image can't do this step for
+#    you because the unit is per-user and is generated from the
+#    template by this tool.
+dockerd-rootless-setuptool.sh install
+
+# 3. Verify rootless is actually the active daemon.
 docker info | grep -i rootless
 # expect:   Rootless: true
 ```

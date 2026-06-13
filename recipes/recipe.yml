@@ -115,17 +115,11 @@ modules:
         - node_exporter.service
       masked:
         # Block the rootful system dockerd from ever starting. We want
-        # rootless only; the per-user docker.service (from
-        # docker-ce-rootless-extras) is enabled in the `user:` block
-        # below. Mask (not just disable) so a stray `systemctl enable
-        # docker` after rebase can't quietly re-enable it.
-        - docker.service
-    user:
-      enabled:
-        # Per-user rootless dockerd. Activates on first login; for it
-        # to also run at boot before any login, run once after rebase:
-        #   sudo loginctl enable-linger $USER
-        # (documented in the README "Post-Installation" section).
+        # rootless only; the per-user docker.service is generated on
+        # demand by `dockerd-rootless-setuptool.sh install` (which the
+        # user runs once after rebase -- see README), so it can't be
+        # enabled at image-build time (it would live in the user's
+        # home, not in /usr/lib/systemd/user/).
         - docker.service
 
   - type: default-flatpaks
