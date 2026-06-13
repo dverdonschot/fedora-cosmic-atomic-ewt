@@ -52,6 +52,30 @@ If build on Fedora Atomic, you can generate an offline ISO with the instructions
 
 ## Post-Installation Configuration
 
+### Rootless Docker (one-time, after rebase)
+
+The image ships with **rootless Docker pre-configured**: `docker-ce-rootless-extras`,
+`uidmap`, and `fuse-overlayfs` are installed, the system `docker.service` is masked,
+and the per-user `docker.service` is enabled. Two things to do once, after a fresh
+rebase:
+
+```bash
+# 1. Allow the per-user rootless dockerd to run at boot, before any login.
+#    Without this, it only starts when you're logged in via the desktop.
+sudo loginctl enable-linger $USER
+
+# 2. Verify rootless is actually the active daemon.
+docker info | grep -i rootless
+# expect:   Rootless: true
+```
+
+If `Rootless:` is missing, the per-user unit isn't running yet — start it and check:
+
+```bash
+systemctl --user status docker
+systemctl --user start docker
+```
+
 ### AMD GPU Stability (Built-in)
 
 This image includes AMD GPU stability fixes for systems with AMD Radeon integrated graphics (tested on Radeon 780M). The following kernel parameters are automatically applied:

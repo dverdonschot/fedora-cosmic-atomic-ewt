@@ -56,6 +56,13 @@ modules:
         - containerd.io
         - docker-buildx-plugin
         - docker-compose-plugin
+        # Rootless Docker: per-user daemon + uidmap/fuse deps so
+        # `systemctl --user start docker` works out of the box.
+        # The system docker.service is masked below; only the
+        # per-user unit from docker-ce-rootless-extras is enabled.
+        - docker-ce-rootless-extras
+        - uidmap
+        - fuse-overlayfs
         - libvirt
         - libvirt-daemon-config-network
         - libvirt-daemon-kvm
@@ -99,12 +106,25 @@ modules:
     install:
       - https://desktop.docker.com/linux/main/amd64/docker-desktop-x86_64.rpm
 
-  # Enable Docker service
+  # Enable Docker service (rootless per-user; system dockerd is masked)
   - type: systemd
     system:
       enabled:
-        - docker.service
         - node_exporter.service
+      masked:
+        # Block the rootful system dockerd from ever starting. We want
+        # rootless only; the per-user docker.service (from
+        # docker-ce-rootless-extras) is enabled in the `user:` block
+        # below. Mask (not just disable) so a stray `systemctl enable
+        # docker` after rebase can't quietly re-enable it.
+        - docker.service
+    user:
+      enabled:
+        # Per-user rootless dockerd. Activates on first login; for it
+        # to also run at boot before any login, run once after rebase:
+        #   sudo loginctl enable-linger $USER
+        # (documented in the README "Post-Installation" section).
+        - docker.service
 
   - type: default-flatpaks
     configurations:
