@@ -56,13 +56,15 @@ modules:
         - containerd.io
         - docker-buildx-plugin
         - docker-compose-plugin
-        # Rootless Docker: per-user daemon + uidmap/fuse deps so
-        # `systemctl --user start docker` works out of the box.
-        # The system docker.service is masked below; only the
-        # per-user unit from docker-ce-rootless-extras is enabled.
+        # Rootless Docker: per-user daemon.
+        # The system docker.service is masked below; only the per-user
+        # unit from docker-ce-rootless-extras is enabled.
+        #
+        # Note: newuidmap/newgidmap live in the main `shadow-utils`
+        # package on Fedora 44 (no separate `uidmap` subpackage), and
+        # `fuse-overlayfs` is already in the base image, so we don't
+        # add them here. The image base already has both.
         - docker-ce-rootless-extras
-        - uidmap
-        - fuse-overlayfs
         - libvirt
         - libvirt-daemon-config-network
         - libvirt-daemon-kvm

@@ -54,10 +54,12 @@ If build on Fedora Atomic, you can generate an offline ISO with the instructions
 
 ### Rootless Docker (one-time, after rebase)
 
-The image ships with **rootless Docker pre-configured**: `docker-ce-rootless-extras`,
-`uidmap`, and `fuse-overlayfs` are installed, the system `docker.service` is masked,
-and the per-user `docker.service` is enabled. Two things to do once, after a fresh
-rebase:
+The image ships with **rootless Docker pre-configured**: `docker-ce-rootless-extras`
+is layered on (which provides the per-user systemd unit, the rootlesskit binaries,
+and the `dockerd-rootless-setuptool.sh` helper), `shadow-utils` (for
+`newuidmap`/`newgidmap`) and `fuse-overlayfs` are already in the base image, the
+system `docker.service` is masked, and the per-user `docker.service` is enabled.
+Two things to do once, after a fresh rebase:
 
 ```bash
 # 1. Allow the per-user rootless dockerd to run at boot, before any login.
