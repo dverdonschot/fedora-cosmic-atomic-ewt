@@ -10,6 +10,18 @@ on:
 
   pull_request:
   workflow_dispatch: # allow manually triggering builds
+
+# Force every JavaScript action in this run to use Node 24.
+# BlueBuild v1.11.1 transitively depends on docker/setup-buildx-action
+# v4.1.0 and docker/setup-qemu-action v4.0.0, which are pinned to
+# Node 20. GitHub flips the default to Node 24 on 2026-06-16, but
+# opting in now silences the deprecation warning and unblocks anyone
+# who runs the workflow between now and then. Safe to remove once
+# BlueBuild releases a version that pins the docker/* actions at
+# Node-24-compatible versions.
+env:
+  FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: "true"
+
 concurrency:
   # only run one build at a time
   group: ${{ github.workflow }}-${{ github.ref || github.run_id }}
