@@ -57,32 +57,37 @@ If build on Fedora Atomic, you can generate an offline ISO with the instructions
 The image ships with **rootless Docker pre-configured**: `docker-ce-rootless-extras`
 is layered on (which provides the per-user binaries, the rootlesskit helpers, and
 `dockerd-rootless-setuptool.sh`), `shadow-utils` (for `newuidmap`/`newgidmap`) and
-`fuse-overlayfs` are already in the base image, the system `docker.service` is masked.
-Three things to do once, after a fresh rebase, as your normal user (not root):
+`fuse-overlayfs` are already in the base image, the system `docker.service` and
+`docker.socket` are both masked. The rootful `dockerd` cannot start under any
+circumstance, and Docker Desktop is intentionally **not** installed (the rootless
+`docker-ce` daemon is the only engine).
+
+After a fresh rebase, run **one** command as your normal user (not root):
 
 ```bash
-# 1. Allow the per-user rootless dockerd to run at boot, before any login.
-#    Without this, it only starts when you're logged in via the desktop.
-sudo loginctl enable-linger $USER
-
-# 2. Generate the per-user docker.service unit. This creates
-#    ~/.config/systemd/user/docker.service with the right paths for
-#    your user, and enables it. The image can't do this step for
-#    you because the unit is per-user and is generated from the
-#    template by this tool.
-dockerd-rootless-setuptool.sh install
-
-# 3. Verify rootless is actually the active daemon.
-docker info | grep -i rootless
-# expect:   Rootless: true
+/usr/local/bin/setup-rootless-docker.sh
 ```
 
-If `Rootless:` is missing, the per-user unit isn't running yet — start it and check:
+The script is idempotent and will:
+
+1. Enable `linger` for your user (so the per-user daemon survives logout).
+2. Hand off to `dockerd-rootless-setuptool.sh install` to add your
+   `subuid`/`subgid` mapping (it will prompt for sudo — this is expected,
+   and only happens on a fresh machine).
+3. Generate and enable `~/.config/systemd/user/docker.service`.
+4. Start the per-user daemon.
+5. Run `verify-rootless-docker.sh` to confirm the final state.
+
+To re-check the state at any time (e.g. after an `rpm-ostree` upgrade):
 
 ```bash
-systemctl --user status docker
-systemctl --user start docker
+/usr/local/bin/verify-rootless-docker.sh
 ```
+
+If verification ever fails, the script prints a one-line fix for each failed
+assertion. The most common regression is `DOCKER_HOST` being set in your shell
+init to a rootful path (`unix:///var/run/docker.sock`) — unset it, or set it to
+`unix:///run/user/<uid>/docker.sock`.
 
 ### AMD GPU Stability (Built-in)
 
