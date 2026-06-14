@@ -17,6 +17,15 @@ modules:
     files:
       - source: system
         destination: / # copies files/system/* into your image's root folder /
+      # Rootless Docker helper scripts. Listed as individual files with
+      # explicit destinations because on Fedora Atomic `/usr/local` is a
+      # symlink (`/usr/local -> /var/usrlocal`), and the module's bulk
+      # `cp -r` refuses to overwrite a symlink with a directory. File
+      # entries use `cp -f` per-file and follow the symlink transparently.
+      - source: rootless-docker/bin/setup-rootless-docker.sh
+        destination: /usr/local/bin/setup-rootless-docker.sh
+      - source: rootless-docker/bin/verify-rootless-docker.sh
+        destination: /usr/local/bin/verify-rootless-docker.sh
 
   - type: dnf
     repos:
