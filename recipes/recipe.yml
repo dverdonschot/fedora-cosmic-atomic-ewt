@@ -26,6 +26,18 @@ modules:
         destination: /usr/local/bin/setup-rootless-docker.sh
       - source: rootless-docker/bin/verify-rootless-docker.sh
         destination: /usr/local/bin/verify-rootless-docker.sh
+      # Forgejo Actions runner — binary, user-mode unit, post-rebase
+      # setup script, and config template. The unit is shipped but not
+      # enabled; the operator runs `setup-forgejo-runner.sh --enable`
+      # once the registration token is in place. Per-file entries
+      # because /usr/local and /usr/lib/systemd/user on Fedora Atomic
+      # are layer-overlaid (symlinked into /var).
+      - source: modules/forgejo-runner/forgejo-runner.service
+        destination: /usr/lib/systemd/user/forgejo-runner.service
+      - source: modules/forgejo-runner/setup-forgejo-runner.sh
+        destination: /usr/local/bin/setup-forgejo-runner.sh
+      - source: modules/forgejo-runner/config.yaml.j2
+        destination: /etc/forgejo-runner/config.yaml.j2
 
   - type: dnf
     repos:
@@ -93,6 +105,22 @@ modules:
         - nethogs
         - sysstat
         - strace
+        # Forgejo Actions runner. The image ships the binary + the
+        # user-mode systemd unit + the post-rebase setup script.
+        # The setup script does NOT enable or start the unit by
+        # default — the operator runs it explicitly. See
+        # /usr/local/bin/setup-forgejo-runner.sh after the first
+        # boot.
+        - forgejo-runner
+        # ROCm + GPU scheduling. The AMD780 is RDNA3 (Navi 24) on
+        # Phoenix point; the amdgpu kernel module is in the main
+        # kernel, so kernel-modules-extra is for newer devices.
+        # Jobs request /dev/dri (render) and /dev/kfd (KFD compute)
+        # via container.options in config.yaml.
+        - rocm-runtime
+        - rocm-clinfo
+        - rocm-opencl
+        - rocminfo
         - hwinfo
         #- tlp
         #- tlp-rdw

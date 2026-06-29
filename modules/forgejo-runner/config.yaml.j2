@@ -1,0 +1,45 @@
+# forgejo-runner config.yaml — rendered from this template at post-rebase.
+# Filled-in by /usr/local/bin/setup-forgejo-runner.sh; do not edit by hand.
+#
+# Shape matches modules/forgejo-runner.nix on
+# dverdonschot/nixos-systems-configuration / hosts/odroid — single YAML
+# fed into `forgejo-runner register` and `daemon`. The runner writes
+# /var/tmp/forgejo-runner/.runner (token + URL) at register time; the
+# daemon reads it from there at startup.
+#
+# v1 differences vs. odroid:
+#   - container.options: passes `--device /dev/dri --device /dev/kfd`
+#     so jobs can drive the AMD780 iGPU.
+#   - host.workdir_parent is on /var/tmp because Fedora Atomic's /var
+#     is the writable layer (not /var/lib/forge-runner — that dir
+#     would not survive an rpm-ostree rollback).
+
+log:
+  level: info
+
+runner:
+  file:           /var/tmp/forgejo-runner/.runner
+  capacity:       {{ runner_capacity }}
+  timeout:        {{ runner_timeout_seconds }}s
+  insecure:       false
+  fetch_timeout:  {{ runner_fetch_timeout_seconds }}s
+
+cache:
+  enabled: false
+
+container:
+  network:        ""
+  privileged:     false
+  force_pull:     false
+  runtime:        ""
+  workdir_parent: /workspace
+  # --device passes /dev/dri (render node) and /dev/kfd (KFD compute)
+  # into the container. NOT --privileged: privileged=false keeps the
+  # container unprivileged except for these two devices. KFD requires
+  # the user to be in the `render` and `video` groups (verified by
+  # setup-forgejo-runner.sh) and may need a udev rule for /dev/kfd
+  # on the host; flagged as a post-deploy smoke-test item.
+  options:        "--device /dev/dri --device /dev/kfd"
+
+host:
+  workdir_parent: /var/tmp/forgejo-runner/work
