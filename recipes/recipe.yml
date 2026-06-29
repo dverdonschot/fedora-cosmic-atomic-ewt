@@ -38,6 +38,8 @@ modules:
         destination: /usr/local/bin/setup-forgejo-runner.sh
       - source: forgejo-runner/config.yaml.j2
         destination: /etc/forgejo-runner/config.yaml.j2
+      - source: forgejo-runner/README.md
+        destination: /usr/local/share/forgejo-runner/README.md
 
   - type: dnf
     repos:
