@@ -16,7 +16,7 @@ Three decisions locked in by the user:
 
 | Decision | Choice |
 |---|---|
-| Module home | `modules/forgejo-runner` in `fedora-cosmic-atomic-ewt` (mirrors Odroid's pattern) |
+| Module home | `files/forgejo-runner/` in `fedora-cosmic-atomic-ewt` (the recipe's `files:` source paths resolve under `files/`) |
 | GPU mode | Full ROCm + GPU scheduling (RDNA3 iGPU via `/dev/dri` + `/dev/kfd`) |
 | Auth path | `~/.config/forgejo/runners/um790/` (user-owned; system rootless docker) |
 
@@ -61,9 +61,9 @@ Three decisions locked in by the user:
 
 ### Repo A: `dverdonschot/fedora-cosmic-atomic-ewt` (this branch: `feat/forgejo-runner`)
 
-1. **`modules/forgejo-runner/config.toml.j2`** —
+1. **`files/forgejo-runner/config.yaml.j2`** —
    Runner config template. Carved out so the recipe can drop a
-   rendered version at `/etc/forgejo-runner/config.toml` and the
+   rendered version at `/etc/forgejo-runner/config.yaml` and the
    post-rebase script keeps it editable. Fields:
    - `log.level`, `runner.file`, `runner.capacity`, `runner.timeout`
    - `cache.enabled = false` (v1; consistent with Odroid)
@@ -76,7 +76,7 @@ Three decisions locked in by the user:
    - Top-level `[[runners]]` array with `name = "um790-runner"`,
      `url`, `token_url = "file:/.../token"`, `labels = [..., "gpu=amdgpu"]`.
 
-2. **`modules/forgejo-runner/setup-forgejo-runner.sh`** —
+2. **`files/forgejo-runner/setup-forgejo-runner.sh`** —
    Post-rebase one-time setup, modeled on
    `files/rootless-docker/bin/setup-rootless-docker.sh`. Steps:
    1. Refuse root.
@@ -86,20 +86,20 @@ Three decisions locked in by the user:
       not, because Fedora Atomic's group setup is layered).
    4. Materialize per-user token file path
       `~/.config/forgejo/runners/um790/token` (mode 0600).
-   5. Render the template into `~/.config/forgejo-runner/config.toml`
+   5. Render the template into `~/.config/forgejo-runner/config.yaml`
       using `id -u` to fill the UID-in-socket-path.
    6. Enable + start `forgejo-runner.service` in the user systemd
       instance (a `[Unit]` snippet installed at image-build time).
    7. Verify: `systemctl --user is-active forgejo-runner.service`,
       `forgejo-runner --config ... verify` if the binary supports it.
 
-3. **`modules/forgejo-runner/forgejo-runner.service`** —
+3. **`files/forgejo-runner/forgejo-runner.service`** —
    User-mode systemd unit. **Default `enabled=false`, `started=false`**
    per the user's spec ("install + configure, do not start, do not
    authorize"). When the operator runs
    `setup-forgejo-runner.sh`, the script flips both flags.
    - `WorkingDirectory=%h/.local/share/forgejo-runner`
-   - `ExecStart=/usr/bin/forgejo-runner daemon --config %h/.config/forgejo-runner/config.toml`
+   - `ExecStart=/usr/bin/forgejo-runner daemon --config %h/.config/forgejo-runner/config.yaml`
    - `Environment=DOCKER_HOST=unix:///run/user/%U/run/docker.sock`
      (set by the setup script, not here, to avoid a chicken-and-egg
      with the variable substitution at unit-load time)
@@ -110,7 +110,7 @@ Three decisions locked in by the user:
 4. **`recipes/recipe.yml`** — add the systemd unit + binary:
    - **dnf install:** `forgejo-runner` (Fedora 44 package present in
      updates-testing; if not, fallback to a vendored binary in
-     `modules/forgejo-runner/forgejo-runner-bin/...`).
+     `files/forgejo-runner/forgejo-runner-bin/...`).
    - **dnf install for ROCm:** `rocm-runtime`, `rocm-clinfo`,
      `rocm-opencl`, `rocminfo`, plus ensure `kernel-modules-extra`
      is present (`amdgpu` driver shipped in main kernel).
@@ -126,7 +126,7 @@ Three decisions locked in by the user:
      the post-rebase script. Per the user's "configure not start"
      requirement.
    - **files entries:** add the rendered config template under
-     `/etc/forgejo-runner/config.toml.j2` and the setup script under
+     `/etc/forgejo-runner/config.yaml.j2` and the setup script under
      `/usr/local/bin/setup-forgejo-runner.sh`. **Don't** symlink;
      /usr/local works as individual-file copy per existing convention.
 
@@ -171,12 +171,12 @@ modules:
         - rocminfo
   - type: files
     files:
-      - source: modules/forgejo-runner/forgejo-runner.service
+      - source: files/forgejo-runner/forgejo-runner.service
         destination: /usr/lib/systemd/user/forgejo-runner.service
-      - source: modules/forgejo-runner/setup-forgejo-runner.sh
+      - source: files/forgejo-runner/setup-forgejo-runner.sh
         destination: /usr/local/bin/setup-forgejo-runner.sh
-      - source: modules/forgejo-runner/config.toml.j2
-        destination: /etc/forgejo-runner/config.toml.j2
+      - source: files/forgejo-runner/config.yaml.j2
+        destination: /etc/forgejo-runner/config.yaml.j2
 ```
 
 A new `systemd-tmpfiles` snippet or `EnvironmentFile=` snippet to wire
@@ -211,7 +211,7 @@ Implementation-complete:
 1. **`forgejo-runner` RPM availability.** Fedora 44 may not have
    it packaged yet. If absent, fallback: install a vendored binary
    from upstream release tarball under
-   `modules/forgejo-runner/bin/forgejo-runner`. **Need to verify**
+   `files/forgejo-runner/bin/forgejo-runner`. **Need to verify**
    by running `dnf search forgejo-runner` at plan-execution time.
 
 2. **ROCm + rootless Docker + container-selinux.** The kernel
@@ -237,11 +237,14 @@ Implementation-complete:
    outside this plan.
 
 5. **Naming conflict with the **Odroid** module.** The
-   `dverdonschot/nixos-systems-configuration` module is also
-   called `modules/forgejo-runner.nix`. Different filenames
-   (`modules/forgejo-runner/` dir vs `modules/forgejo-runner.nix`
-   file), different hosts, different recipe. **Convention:**
-   keep the Fedora version's directory layout because:
-   (a) it's a blueprint, not a single Nix expression,
-   (b) yadm doesn't deal with `.nix` files anyway.
-   Document the dual naming in MEMORY.md after plan-complete.
+   `dverdonschot/nixos-systems-configuration` module is
+   `modules/forgejo-runner.nix`; the UM790's counterpart lives at
+   `files/forgejo-runner/` in the recipe's `files:` source root.
+   Both are intentionally named "forgejo-runner"; they sit in
+   different repos and have different shapes (one Nix expression,
+   one directory of files). Document the dual naming in MEMORY.md
+   after plan-complete.
+   In-session correction (post-fix): the initial implementation
+   placed the dir under `modules/forgejo-runner/` to mirror the
+   odroid, but the recipe's `source:` paths resolve under `files/`,
+   so the build failed. Relocated to `files/forgejo-runner/`.

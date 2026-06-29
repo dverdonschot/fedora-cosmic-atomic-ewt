@@ -32,11 +32,11 @@ modules:
       # once the registration token is in place. Per-file entries
       # because /usr/local and /usr/lib/systemd/user on Fedora Atomic
       # are layer-overlaid (symlinked into /var).
-      - source: modules/forgejo-runner/forgejo-runner.service
+      - source: forgejo-runner/forgejo-runner.service
         destination: /usr/lib/systemd/user/forgejo-runner.service
-      - source: modules/forgejo-runner/setup-forgejo-runner.sh
+      - source: forgejo-runner/setup-forgejo-runner.sh
         destination: /usr/local/bin/setup-forgejo-runner.sh
-      - source: modules/forgejo-runner/config.yaml.j2
+      - source: forgejo-runner/config.yaml.j2
         destination: /etc/forgejo-runner/config.yaml.j2
 
   - type: dnf
