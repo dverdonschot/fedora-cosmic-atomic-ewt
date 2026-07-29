@@ -1,0 +1,183 @@
+---
+# yaml-language-server: $schema=https://schema.blue-build.org/recipe-v1.json
+# image will be published to ghcr.io/<user>/<name>
+name: fedora-gnome-atomic-ewt
+# description will be included in the image's metadata
+description: Fedora Atomic GNOME image — sane-default fallback for COSMIC debugging
+
+# the base image to build on top of (FROM) and the version tag to use
+# GNOME-on-Atomic: the official Fedora ostree desktop with GNOME Shell.
+# Same Fedora major version as the COSMIC image so the two are comparable.
+base-image: quay.io/fedora-ostree-desktops/silverblue
+image-version: 44 # latest is also supported if you want new updates ASAP
+
+# module configuration, executed in order
+# you can include multiple instances of the same module
+modules:
+  - type: files
+    files:
+      - source: system
+        destination: / # copies files/system/* into your image's root folder /
+      # Rootless Docker helper scripts. Listed as individual files with
+      # explicit destinations because on Fedora Atomic `/usr/local` is a
+      # symlink (`/usr/local -> /var/usrlocal`), and the module's bulk
+      # `cp -r` refuses to overwrite a symlink with a directory. File
+      # entries use `cp -f` per-file and follow the symlink transparently.
+      - source: rootless-docker/bin/setup-rootless-docker.sh
+        destination: /usr/local/bin/setup-rootless-docker.sh
+      - source: rootless-docker/bin/verify-rootless-docker.sh
+        destination: /usr/local/bin/verify-rootless-docker.sh
+      # Forgejo Actions runner — binary, user-mode unit, post-rebase
+      # setup script, and config template. The unit is shipped but not
+      # enabled; the operator runs `setup-forgejo-runner.sh --enable`
+      # once the registration token is in place. Per-file entries
+      # because /usr/local and /usr/lib/systemd/user on Fedora Atomic
+      # are layer-overlaid (symlinked into /var).
+      - source: forgejo-runner/forgejo-runner.service
+        destination: /usr/lib/systemd/user/forgejo-runner.service
+      - source: forgejo-runner/setup-forgejo-runner.sh
+        destination: /usr/local/bin/setup-forgejo-runner.sh
+      - source: forgejo-runner/config.yaml.j2
+        destination: /etc/forgejo-runner/config.yaml.j2
+      - source: forgejo-runner/README.md
+        destination: /usr/local/share/forgejo-runner/README.md
+
+  - type: dnf
+    repos:
+      copr:
+        - aquacash5/nerd-fonts
+    install:
+      packages:
+        - micro
+        - nodejs
+        - npm
+        - python3
+        - python3-pip
+        - uv
+        - vim
+        - tmux
+        - oh-my-posh
+        - hack-nerd-fonts
+        - git
+        - gcc
+        - gcc-c++
+        - pkgconf
+        - python3-devel
+        - dbus-devel
+        - ollama
+        - clang
+        - llvm
+        - llvm-devel
+        - mesa-libOpenCL-devel
+        - ranger
+        - make
+        - rust
+        - rustup
+        - cargo
+        # Docker packages (replacing podman)
+        - docker-ce
+        - docker-ce-cli
+        - containerd.io
+        - docker-buildx-plugin
+        - docker-compose-plugin
+        # Rootless Docker: per-user daemon.
+        # The system docker.service is masked below; only the per-user
+        # unit from docker-ce-rootless-extras is enabled.
+        #
+        # Note: newuidmap/newgidmap live in the main `shadow-utils`
+        # package on Fedora 44 (no separate `uidmap` subpackage), and
+        # `fuse-overlayfs` is already in the base image, so we don't
+        # add them here. The image base already has both.
+        - docker-ce-rootless-extras
+        - libvirt
+        - libvirt-daemon-config-network
+        - libvirt-daemon-kvm
+        - qemu-kvm
+        - qemu
+        - virt-manager
+        - virt-install
+        - virt-viewer
+        - kubernetes-client
+        - helm
+        - nmap
+        - nmap-ncat
+        - wireshark
+        - btop
+        - iotop
+        - iftop
+        - nethogs
+        - sysstat
+        - strace
+        # Forgejo Actions runner. The image ships the binary + the
+        # user-mode systemd unit + the post-rebase setup script.
+        # The setup script does NOT enable or start the unit by
+        # default — the operator runs it explicitly. See
+        # /usr/local/bin/setup-forgejo-runner.sh after the first
+        # boot.
+        - forgejo-runner
+        # ROCm + GPU scheduling. The AMD780 is RDNA3 (Navi 24) on
+        # Phoenix point; the amdgpu kernel module is in the main
+        # kernel, so kernel-modules-extra is for newer devices.
+        # Jobs request /dev/dri (render) and /dev/kfd (KFD compute)
+        # via container.options in config.yaml.
+        - rocm-runtime
+        - rocm-clinfo
+        - rocm-opencl
+        - rocminfo
+        - hwinfo
+        #- tlp
+        #- tlp-rdw
+        - linuxconsoletools
+        # android
+        - waydroid
+        - dkms
+        # OCR
+        - tesseract
+        - tesseract-langpack-nld
+        - net-tools
+        - traceroute
+        # monitoring
+        - node-exporter
+    remove:
+      packages:
+        - firefox
+        - firefox-langpacks
+
+  # Enable + mask Docker (rootless per-user; system dockerd is masked)
+  - type: systemd
+    system:
+      enabled:
+        - node_exporter.service
+      masked:
+        # Block the rootful system dockerd AND its socket from ever
+        # starting. We want rootless only. Both the service and the
+        # socket must be masked, because the socket can activate the
+        # service on first connect (e.g. if anything in the user's
+        # shell init or a system service does a `docker ps`). Masking
+        # only the service would let the socket start it indirectly.
+        #
+        # The per-user docker.service is generated on demand by
+        # `dockerd-rootless-setuptool.sh install` (which the user runs
+        # once after rebase -- see README), so it can't be enabled at
+        # image-build time: it would live in the user's home, not in
+        # /usr/lib/systemd/user/.
+        - docker.service
+        - docker.socket
+
+  - type: default-flatpaks
+    configurations:
+      - notify: true
+        scope: system
+        install:
+          - org.mozilla.firefox
+          - com.github.tchx84.Flatseal
+          - io.freetubeapp.FreeTube
+          - dev.zed.Zed
+          - io.github.zen_browser.zen
+      - scope: user
+
+  - type: script
+    scripts:
+      - setup-libvirt.sh
+
+  - type: signing
