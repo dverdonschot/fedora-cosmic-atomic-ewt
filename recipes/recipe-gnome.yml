@@ -58,6 +58,7 @@ modules:
         - tmux
         - oh-my-posh
         - hack-nerd-fonts
+        - libmanette
         - git
         - gcc
         - gcc-c++
