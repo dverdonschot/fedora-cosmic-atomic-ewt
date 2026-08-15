@@ -111,10 +111,48 @@ systemctl reboot
 
 This setting persists across updates and only needs to be applied once.
 
-## Verification
+### Fallback Image (GNOME)
 
-These images are signed with [Sigstore](https://www.sigstore.dev/)'s [cosign](https://github.com/sigstore/cosign). You can verify the signature by downloading the `cosign.pub` file from this repo and running the following command:
+A second image, `fedora-gnome-atomic-ewt`, is built in parallel from the same
+repo (`recipes/recipe-gnome.yml` → `quay.io/fedora-ostree-desktops/silverblue`).
+It shares the entire personal layer with the COSMIC image — same rootless
+Docker setup, same forgejo-runner, same AMD GPU kargs, same dnf package list,
+same flatpaks, same Fedora major version. The **only** difference is the
+desktop environment.
+
+Use it to isolate whether an issue is COSMIC-specific or a problem with the
+shared layer. Rebase to it the same way:
+
+- First rebase to the unsigned image, to get the proper signing keys and policies installed:
+  ```
+  rpm-ostree rebase ostree-unverified-registry:ghcr.io/dverdonschot/fedora-gnome-atomic-ewt:latest
+  ```
+- Reboot to complete the rebase:
+  ```
+  systemctl reboot
+  ```
+- Then rebase to the signed image, like so:
+  ```
+  rpm-ostree rebase ostree-image-signed:docker://ghcr.io/dverdonschot/fedora-gnome-atomic-ewt:latest
+  ```
+- Reboot again to complete the installation
+  ```
+  systemctl reboot
+  ```
+
+Both images track the same `image-version` in their respective recipes, so
+rebasing between them keeps you on the same Fedora release. To go back to
+COSMIC, run the same sequence with `fedora-cosmic-atomic-ewt`.
+
+The two recipes are kept in lockstep on purpose. See `recipes/README.md` for
+the rationale and what to keep in sync.
+
+## Verification
+Both images are signed with [Sigstore](https://www.sigstore.dev/)'s [cosign](https://github.com/sigstore/cosign)
+using the same key (the one in this repo's `cosign.pub`). To verify a specific image, download `cosign.pub`
+and run:
 
 ```bash
 cosign verify --key cosign.pub ghcr.io/dverdonschot/fedora-cosmic-atomic-ewt
+cosign verify --key cosign.pub ghcr.io/dverdonschot/fedora-gnome-atomic-ewt
 ```

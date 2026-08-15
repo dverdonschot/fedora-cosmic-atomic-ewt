@@ -39,7 +39,12 @@ jobs:
       matrix:
         recipe:
           # !! Add your recipes here
+          # Two recipes, built in parallel. Each recipe's `name:` field
+          # determines the published image: `fedora-cosmic-atomic-ewt`
+          # and `fedora-gnome-atomic-ewt` end up as distinct GHCR
+          # packages under the same owner. See recipes/README.md.
           - recipe.yml
+          - recipe-gnome.yml
     steps:
       - name: Build Custom Image
         uses: blue-build/github-action@v1.11.1
