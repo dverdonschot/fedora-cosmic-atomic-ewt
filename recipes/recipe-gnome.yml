@@ -144,11 +144,38 @@ modules:
         - firefox
         - firefox-langpacks
 
+  # Tailscale. Uses the upstream Tailscale repository instead of
+  # Fedora's own package because upstream ships newer releases.
+  #
+  # `cleanup: true` removes the repo file again after the install, so
+  # no third-party repo is left behind in the image (a leftover repo
+  # file with a remote gpgkey upsets gnome-software and is useless
+  # for rpm-ostree anyway).
+  #
+  # Tailscale therefore updates together with the image: every new
+  # build installs the current upstream release, and the node state in
+  # /var/lib/tailscale survives the rebase.
+  - type: dnf
+    repos:
+      cleanup: true
+      files:
+        - https://pkgs.tailscale.com/stable/fedora/tailscale.repo
+      keys:
+        - https://pkgs.tailscale.com/stable/fedora/repo.gpg
+    install:
+      packages:
+        - tailscale
+
   # Enable + mask Docker (rootless per-user; system dockerd is masked)
   - type: systemd
     system:
       enabled:
         - node_exporter.service
+        # Tailscale node agent. Starts at boot; the first
+        # `sudo tailscale up` on the machine authenticates it and
+        # writes the node state to /var/lib/tailscale, which survives
+        # rebase. See README for the one-time setup.
+        - tailscaled.service
       masked:
         # Block the rootful system dockerd AND its socket from ever
         # starting. We want rootless only. Both the service and the
