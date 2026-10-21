@@ -89,6 +89,38 @@ assertion. The most common regression is `DOCKER_HOST` being set in your shell
 init to a rootful path (`unix:///var/run/docker.sock`) — unset it, or set it to
 `unix:///run/user/<uid>/docker.sock`.
 
+### Tailscale (one-time setup, after rebase)
+
+Both images ship **Tailscale**, installed from the upstream Tailscale repository
+(`https://pkgs.tailscale.com/stable/fedora/tailscale.repo`) rather than Fedora's
+own package, so you always get the current upstream release. The repository file
+is removed again after the install, so no third-party repo is left behind in the
+image.
+
+`tailscaled.service` is enabled and starts at boot. To join your tailnet, run
+this once on the machine:
+
+```bash
+sudo tailscale up
+```
+
+It prints a login URL — open it in a browser and authenticate. The node state
+is written to `/var/lib/tailscale`, which is **not** part of the ostree commit,
+so it survives rebases and image updates. That is also why the Tailscale
+version in the image is refreshed by rebuilding/rebasing the image rather than
+by `rpm-ostree upgrade`: the package lives in the image, not in a layer.
+
+A tray icon is available in the desktop session: run `tailscale systray` (the
+upstream package ships the `systray` subcommand).
+
+If you previously installed Tailscale with `rpm-ostree install tailscale`,
+remove that layer first — otherwise the layered package conflicts with the
+package now shipped in the image:
+
+```bash
+sudo rpm-ostree remove tailscale
+```
+
 ### AMD GPU Stability (Built-in)
 
 This image includes AMD GPU stability fixes for systems with AMD Radeon integrated graphics (tested on Radeon 780M). The following kernel parameters are automatically applied:
