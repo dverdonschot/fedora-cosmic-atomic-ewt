@@ -9,7 +9,7 @@ description: Fedora Atomic GNOME image — sane-default fallback for COSMIC debu
 # GNOME-on-Atomic: the official Fedora ostree desktop with GNOME Shell.
 # Same Fedora major version as the COSMIC image so the two are comparable.
 base-image: quay.io/fedora-ostree-desktops/silverblue
-image-version: 44 # latest is also supported if you want new updates ASAP
+image-version: 45 # latest is also supported if you want new updates ASAP
 
 # module configuration, executed in order
 # you can include multiple instances of the same module
